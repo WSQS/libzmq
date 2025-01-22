@@ -4,8 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+  build_windows:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -91,8 +90,19 @@ jobs:
       working-directory: build_libzmq
       run: ctest -C "%Configuration%"
     - name: Upload build artifacts
-      if: matrix.os == 'windows-2019'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.ARTIFACT_NAME }}
+        name: windows
         path: build_libzmq
+  build_android:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: build-android
+      working-directory: builds/android
+      run: bash ./build.sh arm64
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: android
+        path: builds/android/prefix
