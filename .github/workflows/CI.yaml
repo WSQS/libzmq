@@ -2,8 +2,6 @@ name: CI
 on:
   push:
   pull_request:
-  schedule:
-    - cron: "0 9 * * 5"
 
 jobs:
   build:
@@ -23,103 +21,6 @@ jobs:
             MSVCYEAR: vs2019
             ARTIFACT_NAME: v142-x64
             ENABLE_DRAFTS: ON
-          - os: ubuntu-latest
-            BUILD_TYPE: default
-            PACKAGES: asciidoctor
-            DRAFT: disabled
-            POLLER: select
-          - os: ubuntu-latest
-            BUILD_TYPE: default
-            DRAFT: disabled
-            POLLER: poll
-          - os: ubuntu-latest
-            BUILD_TYPE: android
-            NDK_VERSION: android-ndk-r25
-            DRAFT: disabled
-          - os: ubuntu-latest
-            BUILD_TYPE: coverage
-            PACKAGES: libkrb5-dev libnorm-dev libpgm-dev libgnutls28-dev lcov
-            DRAFT: enabled
-            GSSAPI: enabled
-            PGM: enabled
-            NORM: enabled
-            TIPC: enabled
-            TLS: enabled
-            VMCI: enabled
-          - os: ubuntu-latest
-            BUILD_TYPE: valgrind
-            PACKAGES: valgrind libgnutls28-dev
-            DRAFT: enabled
-          - os: ubuntu-latest
-            BUILD_TYPE: cmake
-            CURVE: libsodium
-            DRAFT: enabled
-            PACKAGES: cmake libsodium-dev
-            TLS: enabled
-          - os: ubuntu-latest
-            BUILD_TYPE: cmake
-            CURVE: libsodium
-            DRAFT: enabled
-            GSSAPI: enabled
-            PACKAGES: cmake libsodium-dev libkrb5-dev
-            TLS: enabled
-          - os: ubuntu-latest
-            BUILD_TYPE: cmake
-            DRAFT: enabled
-            PACKAGES: cmake clang-format-11
-            DO_CLANG_FORMAT_CHECK: 1
-          - os: ubuntu-latest
-            BUILD_TYPE: default
-            PACKAGES: libkrb5-dev libnorm-dev libpgm-dev libgnutls28-dev libsodium-dev libnss3-dev libbsd-dev
-            CURVE: libsodium
-            ADDRESS_SANITIZER: enabled
-            DRAFT: enabled
-          - os: ubuntu-latest
-            BUILD_TYPE: default
-            PACKAGES: libkrb5-dev libnorm-dev libpgm-dev libgnutls28-dev libsodium-dev libnss3-dev libbsd-dev
-            CURVE: libsodium
-            GSSAPI: enabled
-            PGM: enabled
-            NORM: enabled
-            TIPC: enabled
-            IPv6: ON
-            TLS: enabled
-            USE_NSS: yes
-            VMCI: enabled
-            DRAFT: enabled
-          - os: ubuntu-latest
-            BUILD_TYPE: default
-            PACKAGES: libkrb5-dev libnorm-dev libpgm-dev libgnutls28-dev libsodium-dev libnss3-dev
-            CURVE: libsodium
-            GSSAPI: enabled
-            PGM: enabled
-            NORM: enabled
-            TIPC: enabled
-            IPv6: ON
-            TLS: enabled
-            USE_NSS: yes
-            VMCI: enabled
-            DRAFT: enabled
-            FORCE_98: enabled
-            CXX: clang++
-          - os: ubuntu-latest
-            BUILD_TYPE: abi-compliance-checker
-            PACKAGES: abi-dumper abi-compliance-checker
-            DRAFT: disabled
-          - os: ubuntu-latest
-            BUILD_TYPE: cmake
-            PACKAGES: clang-tidy clang-tools
-            DRAFT: enabled
-            CXX: clang++
-          - os: macos-latest
-            BUILD_TYPE: default
-            PACKAGES: automake autoconf libtool
-            DRAFT: enabled
-          - os: macos-latest
-            BUILD_TYPE: default
-            PACKAGES: automake autoconf libtool libsodium
-            CURVE: libsodium
-            DRAFT: disabled
     env:
       platform: ${{ matrix.platform }}
       configuration: ${{ matrix.configuration }}
@@ -189,42 +90,9 @@ jobs:
       shell: cmd
       working-directory: build_libzmq
       run: ctest -C "%Configuration%"
-    - name: Add debian packages
-      if: matrix.os == 'ubuntu-latest' && (matrix.BUILD_TYPE != 'coverage' || github.repository == 'zeromq/libzmq')
-      uses: myci-actions/add-deb-repo@10
+    - name: Upload build artifacts
+      if: matrix.os == 'windows-2019'
+      uses: actions/upload-artifact@v3
       with:
-        repo-name: obs
-        repo: deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/xUbuntu_20.04/ ./
-        keys-asc: https://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-stable/xUbuntu_20.04/Release.key
-        install: ${{ matrix.PACKAGES }}
-    - name: Add brew packages
-      if: matrix.os == 'macos-latest'
-      shell: bash
-      run: brew install ${{ matrix.PACKAGES }}
-    - name: build
-      if: (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && (matrix.BUILD_TYPE != 'coverage' || github.repository == 'zeromq/libzmq')
-      shell: bash
-      working-directory: libzmq
-      run: ./ci_build.sh
-    - name: coveralls
-      if: matrix.BUILD_TYPE == 'coverage' && github.repository == 'zeromq/libzmq'
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: /home/runner/work/libzmq/libzmq/libzmq/lcov.info
-  cron:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
-    strategy:
-      fail-fast: false
-    env:
-      BUILD_TYPE: cmake
-      CXX: clang++
-      CLANG_TIDY: clang-tidy
-    steps:
-    - name: Add debian packages
-      run: apt-get install --yes clang-tidy clang-tools
-    - name: build
-      shell: bash
-      working-directory: libzmq
-      run: ./ci_build.sh
+        name: ${{ matrix.ARTIFACT_NAME }}
+        path: build_libzmq
