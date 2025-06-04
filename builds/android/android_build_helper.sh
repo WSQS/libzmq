@@ -582,6 +582,7 @@ function android_build_library {
             autoreconf -fiv
         fi
 
+	export LDFLAGS="$LDFLAGS -Wl,-soname,libzopho.so"
         ./configure "${CONFIG_OPTS[@]}"
         make -j 4
         make install
