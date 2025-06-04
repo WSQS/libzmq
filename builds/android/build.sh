@@ -81,7 +81,7 @@ fi
 export ANDROID_BUILD_CXXSTL="gnustl_shared_49"
 
 # Additional flags for LIBTOOL, for LIBZMQ and other dependencies.
-export LIBTOOL_EXTRA_LDFLAGS='-avoid-version'
+export LIBTOOL_EXTRA_LDFLAGS='-avoid-version -Wl,-soname=libzopho.so'
 
 # Set up android build environment and set ANDROID_BUILD_OPTS array
 android_build_set_env "${BUILD_ARCH}"
