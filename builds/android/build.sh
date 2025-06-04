@@ -89,6 +89,8 @@ android_download_ndk
 android_build_env
 android_build_opts
 
+export LDFLAGS="${LDFLAGS} -Wl,-soname=libzopho.so"
+
 # Check for environment variable to clear the prefix and do a clean build
 if [ "${ANDROID_BUILD_CLEAN}" = "yes" ]; then
     android_build_trace "Doing a clean build (removing previous build and dependencies)..."
