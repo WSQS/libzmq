@@ -20,10 +20,10 @@ jobs:
             os: windows-2022
             WITH_LIBSODIUM: ON
             ENABLE_CURVE: ON
-            CMAKE_GENERATOR: Visual Studio 16 2019
-            MSVCVERSION: v142
-            MSVCYEAR: vs2019
-            ARTIFACT_NAME: v142-x64
+            CMAKE_GENERATOR: Visual Studio 17 2022
+            MSVCVERSION: v143
+            MSVCYEAR: vs2022
+            ARTIFACT_NAME: v143-x64
             ENABLE_DRAFTS: ON
           - os: ubuntu-latest
             BUILD_TYPE: default
@@ -155,7 +155,7 @@ jobs:
       ANDROID_NDK_ROOT: /tmp/${{ matrix.NDK_VERSION }}
     steps:    
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v2
       if: matrix.os == 'windows-2022'
     - uses: actions/checkout@v2
       if: matrix.WITH_LIBSODIUM == 'ON'
