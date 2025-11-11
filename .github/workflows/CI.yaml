@@ -214,6 +214,23 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: /home/runner/work/libzmq/libzmq/libzmq/lcov.info
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: matrix.os
+        path: build_libzmq
+  build_android:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: build-android
+      working-directory: builds/android
+      run: bash ./build.sh arm64
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: android
+        path: builds/android/prefix
   cron:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
