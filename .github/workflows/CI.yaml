@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    if: github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -231,6 +231,20 @@ jobs:
       with:
         name: android
         path: builds/android/prefix
+  build_linux_arm64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install cross-compiler
+      run: sudo apt-get install --yes autoconf automake libtool pkg-config gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu file
+    - name: build-linux-arm64
+      working-directory: builds/linux-arm64
+      run: bash ./build.sh
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-arm64
+        path: builds/linux-arm64/prefix
   cron:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
