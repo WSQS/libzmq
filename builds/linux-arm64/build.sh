@@ -24,7 +24,7 @@ CONFIG_OPTS+=("LD=${TOOLCHAIN_PREFIX}-ld")
 CONFIG_OPTS+=("STRIP=${TOOLCHAIN_PREFIX}-strip")
 CONFIG_OPTS+=("--disable-curve")
 CONFIG_OPTS+=("--enable-static")
-CONFIG_OPTS+=("--disable-shared")
+CONFIG_OPTS+=("--enable-shared")
 
 cd ../..
 ./autogen.sh
